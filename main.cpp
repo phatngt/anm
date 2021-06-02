@@ -1,5 +1,5 @@
-#include <iostream>
-#include "PrimeGenerator.h"
+#include "rsa.h"
+#include "utils.h"
 
 using namespace std;
 #define _TIME int starts,finishs;
@@ -8,16 +8,9 @@ using namespace std;
 
 int main()
 {
-    PrimeGenerator genprime;
-    genprime.PrG_set_size(3072);
-    _TIME
-    while(true)
-    {
-        STARTS_TIME
-        genprime.PrG_renew();
-        cout<<genprime.PrG_generate_strong_prime().get_str()<<endl;
-        //cout<<genprime.PrG_generate_prime().get_str()<<endl;
-        FINISHS_TIME
-    }
+    createKeys(500);
+    int a = 10;
+    a = a&1;
+    cout<<a<<endl;
     return 0;
 }

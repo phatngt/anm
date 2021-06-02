@@ -1,4 +1,4 @@
-#include "PrimeGenerator.h"
+#include "primeGenerator.h"
 
 PrimeGenerator::PrimeGenerator(void)
 {
@@ -12,29 +12,24 @@ void PrimeGenerator::renew()
     //Create random bit with length range 0->pg_lenght
     NTL::RandomBits(numbersite,pg_lenght);
 
-    stringstream buffer;  
+    stringstream buffer;
     buffer<<numbersite; //Shift numbersite(bit) to the left of the buffer
-    
+
     this->pg_number = buffer.str(); //Set bits in the buffer to pg_number(type mpz_class)
     /****************************/
     /*check and add bit such that bit was make have to equal size of prime was defined*/
     string pg_base2 = pg_number.get_str(2);
-    
+
     for(int pg_base2_len = pg_base2.length() ; pg_base2_len < this->pg_lenght ; pg_base2_len++){
         pg_base2 += '1';
     }
-    this->pg_number.set_str(pg_base2,2); 
+    this->pg_number.set_str(pg_base2,2);
     /****************************/
-    //if((this->pg_number & 1)== 0) this->pg_number=(this->pg_number | 1);
 
     /*renew bitget,make to preprocess and pg_index*/
-    
-    pg_bit_get = new vector<bool>(this->pg_sieve_size); //Create boolt vector is false value with range of the pg_sieve_size size 
-    // int count = 0;
-    // for(auto it =pg_bit_get->begin(); it !=pg_bit_get->end(); it++){
-    //     std::cout<<*it;
-    //     count++;
-    // }
+
+    pg_bit_get = new vector<bool>(this->pg_sieve_size); //Create boolt vector is false value with range of the pg_sieve_size size
+
     preprocess();
     this->pg_index = 0;
 }
@@ -48,12 +43,11 @@ long PrimeGenerator::get_size()const
 ZZZ PrimeGenerator::generate_prime()
 {
     /*after preprocess, make to check prime by rabin miller test*/
-   
+
     while(true)
     {
         for( ; this->pg_index < pg_sieve_size ; this->pg_index += 2)
         {
-            // cout<<pg_bit_get->at(this->pg_index);
             if(pg_bit_get->at(this->pg_index) == 0)
             {
                 ZZZ k=this->pg_number+this->pg_index;
@@ -70,17 +64,14 @@ ZZZ PrimeGenerator::generate_prime()
 void PrimeGenerator::preprocess()
 {
 	int j = 1;
-    cout<<"prime number: "<<this->pg_number<<endl;
 	while (j<1000) {
 		ZZZ p = pg_prime_sample[j++];
 		ZZZ r = this->pg_number % p;
-        cout<<" ; p: "<<p << " ; r: " << r << " ; p-r = "<<p-r<<endl;
 		for (ZZZ i = p - r; i < pg_sieve_size; i += p)
-		{      
+		{
 			this->pg_bit_get->at(i.get_ui()) = true;
 		}
 	}
-    cout<<pg_sieve_size;
 }
 bool PrimeGenerator::prime_test(const ZZZ& n,unsigned int len)
 {
@@ -135,16 +126,16 @@ bool PrimeGenerator::rabin_miller_test(const ZZZ& n, const ZZZ& x, long &k, cons
 	return (z != 1 || y != (n^1))?true:false;
 }
 
-ZZZ PrimeGenerator::generate_strong_prime()
+ZZZ PrimeGenerator::generate_strong_prime(long sizeNumber)
 {
     /*STEP1: Generate two other primes: P-- and p+*/
     ZZZ p_sub_sub,p_plus;
     long size_prime=pg_lenght;
-    PrG_set_size(size_prime/2-10);
+    PrG_set_size(sizeNumber);
     renew();
     p_sub_sub=generate_prime();
 
-    PrG_set_size(size_prime/2-3);
+    PrG_set_size(sizeNumber);
     renew();
     p_plus=generate_prime();
 
@@ -205,13 +196,3 @@ PrimeGenerator::~PrimeGenerator(void)
 {
     delete this->pg_bit_get;
 }
-
-int main(int argc, char const *argv[])
-{
-    PrimeGenerator pg;
-    pg.PrG_set_size(100);
-    pg.renew();
-    pg.generate_prime();
-    return 0;
-}
-

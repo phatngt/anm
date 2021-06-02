@@ -68,7 +68,7 @@ class PrimeGenerator
         /*this function allows check prime number*/
         bool check_prime(const ZZZ& n);
         /*Generate strong prime number with size_strong_prime*/
-        ZZZ generate_strong_prime();
+        ZZZ generate_strong_prime(long sizeNumber);
 
         ~PrimeGenerator(void);
 };

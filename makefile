@@ -17,7 +17,7 @@ vpath %.h $(INCLUDE)
 
 MAKE = $(CC) $(INC) 
 
-OBJ_FILE = $(addprefix $(OBJ)/,PrimeGenerator.o main.o)
+OBJ_FILE = $(addprefix $(OBJ)/,rsa.o primeGenerator.o utils.o main.o)
 HEADER = $(wildcard $(INCLUDE)/*.h)
 
 all: $(OBJ_FILE)
