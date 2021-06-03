@@ -11,5 +11,6 @@ typedef mpz_class ZZZ;
 ZZZ powerMoldulo(const ZZZ& p, ZZZ e, const ZZZ& m);
 ZZZ euclideExtends(ZZZ m, ZZZ e);
 ZZZ gcdBigNumber(ZZZ a, ZZZ b);
-
+ZZZ powerBigNumber(ZZZ e, ZZZ b);
+ZZZ createEncryptKey(long sizeNumber, ZZZ phi);
 #endif

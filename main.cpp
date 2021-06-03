@@ -8,9 +8,8 @@ using namespace std;
 
 int main()
 {
-    createKeys(500);
-    int a = 10;
-    a = a&1;
-    cout<<a<<endl;
+
+    createKeys("privatekey.txt","publickey.txt", 500);
+    // cout<<powerBigNumber(2034,1234);
     return 0;
 }

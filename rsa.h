@@ -6,6 +6,6 @@
 #include <gmp.h>
 #include <gmpxx.h>
 
-void createKeys(long sizeNumber);
+void createKeys(char* nameFilePrivateKey, char* nameFilePublicKey,long sizeNumber);
 
 #endif

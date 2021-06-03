@@ -57,36 +57,53 @@ ZZZ euclideExtends(ZZZ m, ZZZ e){
 
 }
 
-ZZZ gcdBigNumber(ZZZ m, ZZZ n)
+ZZZ powerBigNumber(ZZZ e, ZZZ b){
+    /**
+     * return d = b^e
+    **/
+   ZZZ res = 1;
+   ZZZ temp = b;
+
+   while (e > 0)
+   {
+        if ((e & 1) == 1) res = res*temp;
+        e >>= 1;
+        temp = temp* temp;
+   }
+   return res;
+}
+
+ZZZ gcdBigNumber(ZZZ a, ZZZ b)
 {
     /* GCD(0, b) == b; GCD(a, 0) == a,
        GCD(0, 0) == 0 */
-    ZZ a = conv<ZZ>(m.get_str(10));
-    ZZ b = conv<ZZ>(n.get_str(10));
-    if (IsZero(a))
+    if (a == 0)
         return b;
-    if (IsZero(b))
+    if (b == 0)
         return a;
 
     /*Finding K, where K is the
       greatest power of 2
       that divides both a and b. */
+
     long k;
-    for (k = 0; IsZero((a | b) & ZZ(1)); ++k)
+
+    for (k = 0; ((a | b) & 1) == 0; ++k)
     {
         a = a/2;
         b = b/2;
+
     }
 
     /* Dividing a by 2 until a becomes odd */
-    while (IsZero((a & ZZ(1))))
+    while ((a & 1)== 0)
         a = a/2;
 
         /* From here on, 'a' is always odd. */
     do
     {
         /* If b is even, remove all factor of 2 in b */
-        while (IsZero((b & ZZ(1))))
+        while ((b & 1) == 0)
             b = b/2;
 
         /* Now a and b are both odd.
@@ -95,15 +112,28 @@ ZZZ gcdBigNumber(ZZZ m, ZZZ n)
         if (a > b)
             // Swap a and b
         {
-                ZZ temp = a;
+                ZZZ temp = a;
                 a = b;
                 b = temp;
         }
 
         b = (b - a);
 
-    }while (!IsZero(b));
+    }while (!(b == 0));
 
     /* restore common factors of 2 */
-    return a * power(ZZ(2), k);
+    return a*powerBigNumber(k,2);
+}
+
+ZZZ createEncryptKey(long sizeNumber, ZZZ phi){
+    ZZZ e,k;
+     do{
+        gmp_randclass e_random(gmp_randinit_default);
+        e_random.seed(time(NULL));
+        e = e_random.get_z_bits(sizeNumber);
+        ZZZ e_even = e&1;
+        if(e_even == 0) e = e|1;
+        k = gcdBigNumber(e,phi);
+    }while (k!=1);
+    return e;
 }

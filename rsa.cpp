@@ -2,28 +2,41 @@
 #include "primeGenerator.h"
 #include "rsa.h"
 
-void createKeys( long sizeNumber){
+void createKeys(char* nameFilePrivateKey, char* nameFilePublicKey, long sizeNumber){
 
     PrimeGenerator primeGenerator;
-    // ofstream privateFile(nameFilePrivateKey);
-    // ofstream publicFile(nameFilePublicKey);
+    ofstream privateFile(nameFilePrivateKey);
+    ofstream publicFile(nameFilePublicKey);
 
     ZZZ p = primeGenerator.generate_strong_prime(sizeNumber);
     ZZZ q = primeGenerator.generate_strong_prime(sizeNumber);
 
-    ZZZ n = (p-1)*(q-1);
+    ZZZ n = p*q;
+    ZZZ phi = (p-1)*(q-1);
 
-    ZZZ e, k;
+    ZZZ e;
+    e = createEncryptKey(sizeNumber,phi);
 
-    do{
-        gmp_randclass e_random(gmp_randinit_default);
-        e_random.seed(time(NULL));
-        e = e_random.get_z_bits(sizeNumber);
-        ZZZ e_even = e&1;
-        if(e_even == 0) e = e|1;
-        // k = gcdBigNumber()
+    ZZZ d;
+    do
+    {
+        d = euclideExtends(phi,e);
+        e = createEncryptKey(sizeNumber,phi);
+    } while (d == -1);
 
-    }while (k!=1);
+    /* private key */
+    privateFile<<n.get_str()<<endl;
+    privateFile<<d.get_str()<<endl;
 
+    privateFile.clear();
+    privateFile.close();
+
+    /* public key */
+
+    publicFile<<n.get_str()<<endl;
+    publicFile<<e.get_str()<<endl;
+
+    publicFile.clear();
+    publicFile.close();
 
 }
