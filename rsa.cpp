@@ -2,6 +2,58 @@
 #include "primeGenerator.h"
 #include "rsa.h"
 
+ZZ stringToNumber(string str)
+{
+  ZZ number = conv<ZZ>(str[0]);
+  long len = str.length();
+  for(long i = 1; i < len; i++)
+  {
+      number *= 128;
+      number += conv<ZZ>(str[i]);
+  }
+
+  return number;
+}
+
+string numberToString(ZZ num)
+{
+    long len = ceil(log(num)/log(128));
+    char str[len];
+    for(long i = len-1; i >= 0; i--)
+    {
+        //cout << num%128 << endl;
+        str[i] = conv<int>(num % 128);
+        num /= 128;
+    }
+    string s = "";
+    for(int i = 0; i < len; i++){
+      s = s + str[i];
+    }
+
+    return s;
+}
+
+ZZ PowerModula(const ZZ& a, const ZZ& e, const ZZ& n)
+{
+    // (a power e) mod n
+   if (e == 0) return ZZ(1);
+
+   long k = NumBits(e);
+
+   ZZ res;
+   res = 1;
+
+   for (long i = k-1; i >= 0; i--) {
+      res = (res*res) % n;
+      if (bit(e, i) == 1) res = (res*a) % n;
+   }
+
+   if (e < 0)
+      return InvMod(res, n);
+   else
+      return res;
+}
+
 void createKeys(char* nameFilePrivateKey, char* nameFilePublicKey, long sizeNumber){
 
     PrimeGenerator primeGenerator;
@@ -25,18 +77,122 @@ void createKeys(char* nameFilePrivateKey, char* nameFilePublicKey, long sizeNumb
     } while (d == -1);
 
     /* private key */
-    privateFile<<n.get_str()<<endl;
-    privateFile<<d.get_str()<<endl;
+    privateFile << n.get_str() << endl;
+    privateFile << d.get_str() << endl;
 
     privateFile.clear();
     privateFile.close();
 
     /* public key */
 
-    publicFile<<n.get_str()<<endl;
-    publicFile<<e.get_str()<<endl;
+    publicFile << n.get_str() << endl;
+    publicFile << e.get_str() << endl;
 
     publicFile.clear();
     publicFile.close();
 
+}
+
+void cryptRSA (char* fileMText,char* fileKey,char *fileCrypt)
+{
+    //string headCode = "1000010010000100"; /*head16bit*/
+    ifstream filetext(fileMText);
+    ifstream filekey(fileKey);
+    ofstream filecrypt(fileCrypt);
+    if(!filetext){
+        cout<<"Fail!Filetext isn't exist";
+        return;
+    }
+    if(!filekey){
+        cout<<"Fail!Filekey isn't exist";
+        return;
+    }
+    /*read key from fileKey*/
+    string TEXT;
+    ZZ n, e, M, C;
+
+    // get n
+    filekey >> TEXT;
+    n = conv<ZZ>(TEXT.c_str());
+
+    // get e
+    filekey >> TEXT;
+    e = conv<ZZ>(TEXT.c_str());
+
+    //get M
+    //filetext >> TEXT;
+    getline(filetext, TEXT);
+
+    string subText;
+    size_t pos = 0;
+    size_t Text_len = TEXT.length();
+
+    while(Text_len > 100){
+        subText = TEXT.substr(pos, 100);
+
+        M = stringToNumber(subText);
+        C = PowerModula(M, e, n);
+        filecrypt << C << endl;
+
+        pos+=100;
+        Text_len -= 100;
+        if(Text_len <= 100)
+            TEXT = TEXT.substr(pos, Text_len);
+    }
+
+    M = stringToNumber(TEXT);
+
+    C = PowerModula(M, e, n);
+
+    filecrypt << C << endl;
+
+    filecrypt.close();
+    filetext.close();
+    filekey.close();
+}
+
+void decryptRSA (char* fileEncrypt,char* fileKey,char *fileDecrypt)
+{
+    ifstream fileEnc(fileEncrypt);
+    ofstream decrypt(fileDecrypt);
+    ifstream PK(fileKey);
+     if(!PK){
+        cout<<"Fail!publicKey.txt isn't exist";
+        return;
+    }
+    if(!fileEnc){
+        cout<<"Fail!filetext.txt isn't exist";
+        return;
+    }
+
+    ZZ n, d, C, M;
+    string text;
+    string final_str_dec = "";
+
+    // get n
+    PK >> text;
+    n = conv<ZZ>(text.c_str());
+
+    //get d
+    PK >> text;
+    d = conv<ZZ>(text.c_str());
+
+    while(getline(fileEnc, text)) {
+        // get C
+        C = conv<ZZ>(text.c_str());
+
+        M = PowerModula(C, d, n);
+
+        string ZZ_str = numberToString(M);
+
+        final_str_dec = final_str_dec + ZZ_str;
+        //cout << final_str_dec << endl;
+        text = "";
+    }
+
+    decrypt << final_str_dec << endl;
+
+    fileEnc.close();
+    decrypt.close();
+    PK.close();
 }
