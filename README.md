@@ -17,7 +17,7 @@ sudo apt-get install -y libgmp-dev
 ```
 
 ## Install tool to build the project
-Install make
+Install make file tool
 ```bash
 sudo apt-get install make
 ```
@@ -31,7 +31,7 @@ make all
 
 Run project
 ```bash
-make run [filename.txt]
+make run FILE=[filename.txt]
 ```
 
 Clean pre-compile project

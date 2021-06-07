@@ -12,10 +12,12 @@ DEBUG = -g
 CFLAGS = -Wall -c $(DEBUG)
 LFLAGS = -Wall $(DEBUG)
 
+FILE = file
+
 vpath %.cpp $(SRC)
 vpath %.h $(INCLUDE)
 
-MAKE = $(CC) $(INC) 
+MAKE = $(CC) $(INC)
 
 OBJ_FILE = $(addprefix $(OBJ)/,rsa.o primeGenerator.o utils.o main.o)
 HEADER = $(wildcard $(INCLUDE)/*.h)
@@ -32,7 +34,7 @@ clean:
 	@echo "Clean successfully"
 
 run:
-	./$(TARGET)
-	
+	./$(TARGET) $(FILE)
+
 #Compiler single file for test cases
 #g++ -Wall PrimeGenerator.cpp -o test -lntl -lgmp -lgmpxx
